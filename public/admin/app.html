@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>GreenBasket Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#0b7a4b;--gd:#066b41;--gl:#e5f3ec;--y:#ffc107;--yl:#fff4cc;--bg:#f4f4f4;--tx:#1d1d1d;--mu:#5f5f5f;--ln:#e6e6e6;--err:#b3261e;--errl:#fde8e6;color-scheme:light}
+*{box-sizing:border-box;margin:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;padding-bottom:env(safe-area-inset-bottom,0)}
+button{font:inherit;cursor:pointer;border:0}
+:focus-visible{outline:3px solid var(--y);outline-offset:2px}
+[hidden]{display:none!important}
+.top{background:var(--g);color:#fff;display:flex;align-items:center;gap:14px;padding:calc(12px + env(safe-area-inset-top,0)) 24px 12px;position:sticky;top:0;z-index:5}
+.top b{font-size:18px}.top .tag{background:var(--y);color:#222;font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px}
+.top .who{margin-left:auto;font-size:13px;opacity:.95}
+.out{background:var(--y);color:#222;font-weight:600;font-size:13px;padding:8px 14px;border-radius:6px}
+.shell{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 56px)}
+nav{background:#fff;border-right:1px solid var(--ln);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+nav button{display:flex;align-items:center;gap:10px;background:none;text-align:left;padding:11px 12px;border-radius:8px;font-weight:500;color:var(--mu)}
+nav button:hover{background:var(--bg)}
+nav button[aria-current=page]{background:var(--gl);color:var(--gd);font-weight:600}
+nav svg{width:18px;height:18px;flex:none}
+nav .viewshop{margin-top:auto;font-size:13px;color:var(--mu);padding:11px 12px;text-decoration:none}
+main{padding:24px;min-width:0}
+h1{font-size:22px;margin-bottom:4px}.lead{color:var(--mu);margin-bottom:20px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.tile{background:#fff;border-radius:10px;padding:16px;border-top:4px solid var(--g)}
+.tile.y{border-top-color:var(--y)}
+.tile small{color:var(--mu);font-size:13px;display:block;margin-bottom:6px}
+.tile b{font-size:24px}
+.panel{background:#fff;border-radius:10px;padding:18px;margin-bottom:20px}
+.panel h2{font-size:16px;margin-bottom:12px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.bar input,.bar select{padding:10px 12px;border:1px solid var(--ln);border-radius:8px;font:inherit;background:#fff;color:var(--tx);min-width:0}
+.bar input{flex:1;min-width:160px}
+.btn{background:var(--g);color:#fff;font-weight:600;padding:10px 18px;border-radius:30px}
+.btn:hover{background:var(--gd)}
+.btn.ghost{background:#fff;color:var(--g);border:1px solid var(--g)}
+.btn.danger{background:var(--err)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{text-align:left;font-size:12px;color:var(--mu);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--ln);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--ln);vertical-align:middle}
+.nw{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.thumb{width:44px;height:44px;border-radius:8px;background:var(--bg);object-fit:contain;display:block}
+.thumb.none{display:grid;place-items:center;color:var(--mu);font-size:11px}
+.nm{font-weight:600}.sm{color:var(--mu);font-size:12px}
+s{color:var(--mu);font-size:12px;margin-left:4px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--gl);color:var(--gd);white-space:nowrap}
+.pill.off{background:var(--bg);color:var(--mu)}.pill.warn{background:var(--yl);color:#7a5a00}.pill.bad{background:var(--errl);color:var(--err)}
+.low{color:#7a5a00;font-weight:700}
+.acts{display:flex;gap:6px;white-space:nowrap}
+.acts button{background:var(--bg);padding:7px 12px;border-radius:6px;font-weight:600;font-size:13px}
+.acts button:hover{background:var(--gl)}.acts .del{color:var(--err)}.acts .del:hover{background:var(--errl)}
+td select{padding:7px 8px;border:1px solid var(--ln);border-radius:6px;font:inherit;background:#fff}
+.empty{text-align:center;color:var(--mu);padding:28px 10px}
+dialog{margin:auto;border:0;border-radius:12px;padding:0;width:min(560px,calc(100% - 24px));max-height:92vh;box-shadow:0 12px 50px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--ln)}
+.dh b{font-size:17px}.dh button{background:none;font-size:20px;color:var(--mu);padding:4px 8px}
+.db{padding:20px;overflow:auto;max-height:calc(92vh - 130px)}
+.df{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--ln)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:12px}
+label input,label select{width:100%;margin-top:5px;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;font:inherit;background:#fff;color:var(--tx)}
+label input:focus{border-color:var(--g)}
+.chk{display:flex;gap:8px;align-items:center;font-weight:500}.chk input{width:auto;margin:0}
+.photo{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.photo .thumb{width:84px;height:84px}
+.photo .ph{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.photo input[type=file]{display:none}
+.ferr{color:var(--err);min-height:18px;font-size:13px;margin-bottom:4px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:8px 12px;margin-bottom:14px}.kv dt{color:var(--mu)}.kv dd{margin:0;overflow-wrap:anywhere}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0));transform:translate(-50%,16px);background:var(--g);color:#fff;padding:11px 20px;border-radius:30px;font-weight:500;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}.toast.bad{background:var(--err)}
+@media(max-width:860px){
+ .shell{grid-template-columns:1fr}
+ nav{flex-direction:row;border-right:0;border-bottom:1px solid var(--ln);padding:8px 12px;overflow-x:auto}
+ nav .viewshop{display:none}nav button{white-space:nowrap}
+ .tiles{grid-template-columns:1fr 1fr}main{padding:16px}.top{padding-left:16px;padding-right:16px}.top .who{display:none}.top .out{margin-left:auto}
+ .grid2{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="top"><b>GreenBasket</b><span class="tag">Admin</span><span class="who" id="who"></span><button class="out" id="out">Sign out</button></div>
+<div class="shell">
+<nav aria-label="Dashboard sections">
+  <button data-v="overview" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Overview</button>
+  <button data-v="products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>Products</button>
+  <button data-v="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>Orders</button>
+  <button data-v="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M17 11a3 3 0 100-6M22 21c0-3-2-5-4-6"/></svg>Customers</button>
+  <a class="viewshop" href="/" target="_blank" rel="noopener">View shop</a>
+</nav>
+<main id="main" tabindex="-1">
+
+<section id="v-overview">
+  <h1>Overview</h1><p class="lead">How the shop is doing right now.</p>
+  <div class="tiles">
+    <div class="tile"><small>Revenue (paid orders)</small><b id="s-rev">–</b></div>
+    <div class="tile y"><small>Orders to prepare</small><b id="s-todo">–</b></div>
+    <div class="tile"><small>Products on the shop</small><b id="s-prod">–</b></div>
+    <div class="tile y"><small>Low stock (5 or fewer)</small><b id="s-low">–</b></div>
+  </div>
+  <div class="panel"><h2>Latest orders</h2><div class="scroll"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody id="recent"></tbody></table></div></div>
+</section>
+
+<section id="v-products" hidden>
+  <h1>Products</h1><p class="lead">Add, change or remove what customers see in the shop.</p>
+  <div class="panel">
+    <div class="bar">
+      <input id="psearch" type="search" placeholder="Search products" aria-label="Search products">
+      <select id="pcat" aria-label="Filter by category"><option value="">All categories</option></select>
+      <button class="btn" id="padd">Add product</button>
+    </div>
+    <div class="scroll"><table><thead><tr><th></th><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead><tbody id="ptable"></tbody></table></div>
+  </div>
+</section>
+
+<section id="v-orders" hidden>
+  <h1>Orders</h1><p class="lead">Orders appear here when a customer pays. Update the status as you prepare and deliver.</p>
+  <div class="panel">
+    <div class="bar">
+      <select id="ofilter" aria-label="Filter by status"><option value="">All orders</option><option value="pending">Waiting for payment</option><option value="paid">Paid</option><option value="processing">Preparing</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option><option value="failed">Payment failed</option></select>
+      <button class="btn ghost" id="oref">Refresh</button>
+    </div>
+    <div class="scroll"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody id="otable"></tbody></table></div>
+  </div>
+</section>
+<section id="v-customers" hidden>
+  <h1>Customers</h1><p class="lead">People who created an account on the shop. Guests who check out without an account are not listed here, but their orders still appear under Orders.</p>
+  <div class="panel">
+    <div class="bar"><input id="csearch" type="search" placeholder="Search by name, email or phone" aria-label="Search customers"></div>
+    <div class="scroll"><table><thead><tr><th>Name</th><th>Contact</th><th>Delivery address</th><th>Orders</th><th>Joined</th><th></th></tr></thead><tbody id="ctable"></tbody></table></div>
+  </div>
+</section>
+</main>
+</div>
+
+<dialog id="pd" aria-labelledby="pdt">
+ <form id="pf" method="dialog" novalidate>
+  <div class="dh"><b id="pdt">Add product</b><button type="button" id="pdx" aria-label="Close">✕</button></div>
+  <div class="db">
+    <div class="photo"><img class="thumb" id="pimg" alt="" hidden><div class="thumb none" id="pnone">No photo</div>
+      <div class="ph"><button type="button" class="btn ghost" id="pchoose">Choose photo</button><button type="button" class="acts del" id="prem" style="background:none;color:var(--err);padding:0;font-weight:600" hidden>Remove photo</button><input type="file" id="pfile" accept="image/jpeg,image/png,image/webp"></div></div>
+    <label>Name<input name="name" maxlength="80" required></label>
+    <div class="grid2">
+      <label>Category<input name="category" list="cats" maxlength="40" required placeholder="Fruits"><datalist id="cats"><option>Fruits</option><option>Vegetables</option></datalist></label>
+      <label>Size or unit<input name="unit" maxlength="20" placeholder="500 g, 1 Kg, 1 piece"></label>
+      <label>Price (FCFA)<input name="price" type="number" min="1" step="1" inputmode="numeric" required></label>
+      <label>Old price (FCFA), optional<input name="oldPrice" type="number" min="0" step="1" inputmode="numeric" placeholder="Shown crossed out"></label>
+      <label>In stock<input name="stock" type="number" min="0" step="1" inputmode="numeric" value="100" required></label>
+      <label>Rating (0 to 5)<input name="rating" type="number" min="0" max="5" step="0.1" value="4.8"></label>
+    </div>
+    <label class="chk"><input type="checkbox" name="active" checked> Show this product in the shop</label>
+    <div class="ferr" role="alert" id="pe"></div>
+  </div>
+  <div class="df"><button type="button" class="btn ghost" id="pcancel">Cancel</button><button type="submit" class="btn" id="psave">Save product</button></div>
+ </form>
+</dialog>
+
+<dialog id="od" aria-labelledby="odt">
+  <div class="dh"><b id="odt">Order</b><button type="button" id="odx" aria-label="Close">✕</button></div>
+  <div class="db" id="odb"></div>
+</dialog>
+
+<dialog id="cd" aria-labelledby="cdt">
+  <div class="dh"><b id="cdt">Delete?</b></div>
+  <div class="db" id="cdb"></div>
+  <div class="df"><button type="button" class="btn ghost" id="cno">Keep it</button><button type="button" class="btn danger" id="cyes">Delete</button></div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function fmt(n){return String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g," ")+" FCFA"}
+function when(t){return new Date(t).toLocaleString([], {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
+var ST={pending:["Waiting for payment","warn"],paid:["Paid",""],processing:["Preparing",""],delivered:["Delivered","off"],cancelled:["Cancelled","bad"],failed:["Payment failed","bad"]};
+function pill(s){var x=ST[s]||[s,"off"];return '<span class="pill '+x[1]+'">'+esc(x[0])+'</span>'}
+var tt;function say(m,bad){var t=$("toast");t.textContent=m;t.className="toast show"+(bad?" bad":"");clearTimeout(tt);tt=setTimeout(function(){t.className="toast"},2400)}
+
+function api(method,path,body){
+  return fetch(path,{method:method,headers:body?{"Content-Type":"application/json"}:{},body:body?JSON.stringify(body):undefined})
+   .then(function(r){
+     if(r.status===401){location.href="/admin/";throw new Error("auth")}
+     return r.json().then(function(j){if(!r.ok)throw new Error(j.error||"Something went wrong.");return j});
+   });
+}
+
+/* ---------- navigation ---------- */
+var cur="overview";
+function go(v){
+  cur=v;
+  ["overview","products","orders","customers"].forEach(function(n){$("v-"+n).hidden=n!==v});
+  [].forEach.call(document.querySelectorAll("nav button"),function(b){if(b.dataset.v===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+  history.replaceState(null,"","#"+v);
+  if(v==="overview")loadStats();if(v==="products")loadProducts();if(v==="orders")loadOrders();if(v==="customers")loadCustomers();
+}
+[].forEach.call(document.querySelectorAll("nav button"),function(b){b.onclick=function(){go(b.dataset.v)}});
+
+/* ---------- overview ---------- */
+function loadStats(){api("GET","/api/admin/stats").then(function(s){
+  $("s-rev").textContent=fmt(s.orders.revenue);$("s-todo").textContent=s.orders.todo;
+  $("s-prod").textContent=s.products.active+" of "+s.products.total;$("s-low").textContent=s.products.low;
+  $("recent").innerHTML=s.recent.length?s.recent.map(function(o){return '<tr><td class="nm">'+esc(o.ref)+'</td><td>'+esc(o.customer_name)+'</td><td>'+fmt(o.total)+'</td><td>'+pill(o.status)+'</td><td class="sm">'+when(o.created_at)+'</td></tr>'}).join(""):'<tr><td colspan="5" class="empty">No orders yet. They appear here as soon as a customer pays.</td></tr>';
+}).catch(function(e){if(e.message!=="auth")say(e.message,1)})}
+
+/* ---------- products ---------- */
+var P=[];
+function loadProducts(){return api("GET","/api/admin/products").then(function(r){P=r.products;
+  var cats=[];P.forEach(function(p){if(cats.indexOf(p.category)<0)cats.push(p.category)});
+  var sel=$("pcat"),v=sel.value;sel.innerHTML='<option value="">All categories</option>'+cats.map(function(c){return '<option>'+esc(c)+'</option>'}).join("");sel.value=cats.indexOf(v)>-1?v:"";
+  $("cats").innerHTML=cats.concat(["Fruits","Vegetables"]).filter(function(c,i,a){return a.indexOf(c)===i}).map(function(c){return '<option>'+esc(c)+'</option>'}).join("");
+  drawProducts()}).catch(function(e){if(e.message!=="auth")say(e.message,1)})}
+function drawProducts(){
+  var q=$("psearch").value.trim().toLowerCase(),c=$("pcat").value;
+  var list=P.filter(function(p){return(!q||p.name.toLowerCase().indexOf(q)>-1)&&(!c||p.category===c)});
+  $("ptable").innerHTML=list.length?list.map(function(p){
+    var img=p.has_image?'<img class="thumb" alt="" src="/api/image/'+p.id+'?v='+p.updated_at+'">':'<div class="thumb none">No photo</div>';
+    return '<tr><td>'+img+'</td><td><div class="nm">'+esc(p.name)+'</div><div class="sm">'+esc(p.unit)+'</div></td><td>'+esc(p.category)+'</td><td class="nw">'+fmt(p.price)+(p.old_price?'<s>'+fmt(p.old_price)+'</s>':'')+'</td><td class="'+(p.stock<=5?"low":"")+'">'+p.stock+(p.stock<=5?" (low)":"")+'</td><td>'+(p.active?'<span class="pill">Live</span>':'<span class="pill off">Hidden</span>')+'</td><td><div class="acts"><button data-e="'+p.id+'">Edit</button><button class="del" data-d="'+p.id+'">Delete</button></div></td></tr>'}).join(""):'<tr><td colspan="7" class="empty">'+(P.length?"No products match your search.":"No products yet. Click Add product to create the first one.")+'</td></tr>';
+}
+$("psearch").oninput=drawProducts;$("pcat").onchange=drawProducts;
+
+var editing=null,imgState;
+function openForm(p){
+  editing=p?p.id:null;imgState=undefined;
+  $("pdt").textContent=p?"Edit product":"Add product";$("pe").textContent="";
+  var f=$("pf").elements;
+  f.name.value=p?p.name:"";f.category.value=p?p.category:"";f.unit.value=p?p.unit:"";
+  f.price.value=p?p.price:"";f.oldPrice.value=p&&p.old_price?p.old_price:"";f.stock.value=p?p.stock:100;f.rating.value=p?p.rating:4.8;f.active.checked=p?!!p.active:true;
+  showImg(p&&p.has_image?"/api/image/"+p.id+"?v="+p.updated_at:null);
+  $("pd").showModal();f.name.focus();
+}
+function showImg(src){var has=!!src;$("pimg").hidden=!has;$("pnone").hidden=has;$("prem").hidden=!has;if(has)$("pimg").src=src}
+$("padd").onclick=function(){openForm(null)};
+$("pdx").onclick=$("pcancel").onclick=function(){$("pd").close()};
+$("pchoose").onclick=function(){$("pfile").click()};
+$("prem").onclick=function(){imgState=null;showImg(null);$("pfile").value=""};
+$("pfile").onchange=function(){
+  var file=this.files[0];if(!file)return;
+  if(!/^image\/(jpeg|png|webp)$/.test(file.type)){$("pe").textContent="Choose a JPG, PNG or WebP photo.";return}
+  var url=URL.createObjectURL(file),im=new Image();
+  im.onload=function(){
+    var size=520,out;
+    for(var tries=0;tries<5;tries++){
+      var sc=Math.min(1,size/Math.max(im.width,im.height)),c=document.createElement("canvas");
+      c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));
+      c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+      out=c.toDataURL("image/webp",0.85);if(out.indexOf("data:image/webp")!==0)out=c.toDataURL("image/png");
+      if(out.length<=850000)break;size=Math.round(size*0.75);
+    }
+    URL.revokeObjectURL(url);
+    if(out.length>850000){$("pe").textContent="That photo is too large. Try a smaller one.";return}
+    imgState=out;showImg(out);$("pe").textContent="";
+  };
+  im.onerror=function(){$("pe").textContent="That file could not be read as a photo."};
+  im.src=url;
+};
+$("pf").onsubmit=function(e){
+  e.preventDefault();var f=this.elements,body={
+    name:f.name.value,category:f.category.value,unit:f.unit.value,price:f.price.value,oldPrice:f.oldPrice.value,
+    stock:f.stock.value,rating:f.rating.value,active:f.active.checked};
+  if(imgState!==undefined)body.image=imgState;
+  $("psave").disabled=true;$("pe").textContent="";
+  api(editing?"PUT":"POST",editing?"/api/admin/products/"+editing:"/api/admin/products",body).then(function(){
+    $("pd").close();say(editing?"Product saved":"Product added");loadProducts();
+  }).catch(function(err){if(err.message!=="auth")$("pe").textContent=err.message}).then(function(){$("psave").disabled=false});
+};
+
+/* ---------- delete confirm ---------- */
+var pendingDelete=null;
+function confirmDelete(title,msg,fn){$("cdt").textContent=title;$("cdb").textContent=msg;pendingDelete=fn;$("cd").showModal();$("cno").focus()}
+$("cno").onclick=function(){$("cd").close();pendingDelete=null};
+$("cyes").onclick=function(){var fn=pendingDelete;$("cd").close();pendingDelete=null;if(fn)fn()};
+
+/* ---------- orders ---------- */
+var O=[];
+function loadOrders(){var s=$("ofilter").value;return api("GET","/api/admin/orders"+(s?"?status="+s:"")).then(function(r){O=r.orders;
+  $("otable").innerHTML=O.length?O.map(function(o){
+    var opts=Object.keys(ST).map(function(k){return '<option value="'+k+'"'+(k===o.status?" selected":"")+'>'+esc(ST[k][0])+'</option>'}).join("");
+    return '<tr><td class="nm">'+esc(o.ref)+'</td><td>'+esc(o.customer_name)+'<div class="sm">'+esc(o.phone)+'</div></td><td class="nw">'+fmt(o.total)+'</td><td><select data-s="'+o.id+'" aria-label="Status of order '+esc(o.ref)+'">'+opts+'</select></td><td class="sm">'+when(o.created_at)+'</td><td><div class="acts"><button data-v="'+o.id+'">View</button><button class="del" data-x="'+o.id+'">Delete</button></div></td></tr>'}).join(""):'<tr><td colspan="6" class="empty">No orders here yet.</td></tr>';
+}).catch(function(e){if(e.message!=="auth")say(e.message,1)})}
+$("ofilter").onchange=loadOrders;$("oref").onclick=function(){loadOrders().then(function(){say("Orders refreshed")})};
+
+document.addEventListener("click",function(e){
+  var b;
+  if(b=e.target.closest("[data-e]")){var p=P.filter(function(x){return x.id==b.dataset.e})[0];if(p)openForm(p)}
+  if(b=e.target.closest("[data-d]")){var q=P.filter(function(x){return x.id==b.dataset.d})[0];if(q)confirmDelete("Delete product?",'"'+q.name+'" will be removed from the shop for good. To keep it but hide it, edit it and untick "Show this product in the shop".',function(){
+    api("DELETE","/api/admin/products/"+q.id).then(function(){say("Product deleted");loadProducts()}).catch(function(er){if(er.message!=="auth")say(er.message,1)})})}
+  if(b=e.target.closest("[data-v]")){if(b.closest("nav"))return;var o=O.filter(function(x){return x.id==b.dataset.v})[0];if(o)viewOrder(o)}
+  if(b=e.target.closest("[data-x]")){var o2=O.filter(function(x){return x.id==b.dataset.x})[0];if(o2)confirmDelete("Delete order?","Order "+o2.ref+" from "+o2.customer_name+" will be deleted for good. This does not refund the customer.",function(){
+    api("DELETE","/api/admin/orders/"+o2.id).then(function(){say("Order deleted");loadOrders()}).catch(function(er){if(er.message!=="auth")say(er.message,1)})})}
+});
+document.addEventListener("change",function(e){
+  var s=e.target.closest("[data-s]");if(!s)return;
+  api("PUT","/api/admin/orders/"+s.dataset.s,{status:s.value}).then(function(){say("Status updated");loadOrders()}).catch(function(er){if(er.message!=="auth")say(er.message,1)});
+});
+function viewOrder(o){
+  $("odt").textContent="Order "+o.ref;
+  $("odb").innerHTML='<dl class="kv"><dt>Status</dt><dd>'+pill(o.status)+'</dd><dt>Customer</dt><dd>'+esc(o.customer_name)+'</dd><dt>Phone</dt><dd><a href="tel:+'+esc(o.phone)+'">+'+esc(o.phone)+'</a></dd><dt>Delivery address</dt><dd>'+esc(o.address)+'</dd><dt>Placed</dt><dd>'+when(o.created_at)+'</dd></dl>'+
+  '<div class="scroll"><table style="min-width:0"><thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead><tbody>'+o.items.map(function(i){return '<tr><td>'+esc(i.name)+'</td><td>'+esc(i.qty)+'</td><td>'+fmt(i.price*i.qty)+'</td></tr>'}).join("")+'<tr><td colspan="2"><b>Total</b></td><td><b>'+fmt(o.total)+'</b></td></tr></tbody></table></div>';
+  $("od").showModal();
+}
+$("odx").onclick=function(){$("od").close()};
+
+/* ---------- customers ---------- */
+var CU=[];
+function loadCustomers(){return api("GET","/api/admin/customers").then(function(r){CU=r.customers;drawCustomers()}).catch(function(e){if(e.message!=="auth")say(e.message,1)})}
+function drawCustomers(){
+  var q=$("csearch").value.trim().toLowerCase();
+  var list=CU.filter(function(c){return!q||(c.name+" "+c.email+" "+c.phone).toLowerCase().indexOf(q)>-1});
+  $("ctable").innerHTML=list.length?list.map(function(c){
+    return '<tr><td class="nm">'+esc(c.name)+'</td><td>'+esc(c.email)+'<div class="sm">+'+esc(c.phone)+'</div></td><td>'+(esc(c.address)||'<span class="sm">Not saved</span>')+'</td><td>'+c.orders+'</td><td class="sm">'+when(c.created_at)+'</td><td><div class="acts"><button class="del" data-k="'+c.id+'">Delete</button></div></td></tr>'}).join(""):'<tr><td colspan="6" class="empty">'+(CU.length?"No customers match your search.":"No customer accounts yet. They appear here when someone signs up on the shop.")+'</td></tr>';
+}
+$("csearch").oninput=drawCustomers;
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-k]");if(!b)return;
+  var c=CU.filter(function(x){return x.id==b.dataset.k})[0];if(!c)return;
+  confirmDelete("Delete account?",c.name+" ("+c.email+") will be signed out and the account removed. Their past orders stay in Orders.",function(){
+    api("DELETE","/api/admin/customers/"+c.id).then(function(){say("Account deleted");loadCustomers()}).catch(function(er){if(er.message!=="auth")say(er.message,1)})});
+});
+
+/* ---------- session ---------- */
+$("out").onclick=function(){api("POST","/api/auth/logout",{}).catch(function(){}).then(function(){location.href="/admin/"})};
+api("GET","/api/auth/me").then(function(r){if(!r.admin){location.href="/admin/";return}$("who").textContent=r.admin.name+" · "+r.admin.email;
+  var h=location.hash.replace("#","");go(["overview","products","orders","customers"].indexOf(h)>-1?h:"overview")}).catch(function(){});
+</script>
+</body>
+</html>

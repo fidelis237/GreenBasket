@@ -194,13 +194,28 @@ img.art{height:165px;width:auto;max-width:200px;object-fit:contain;mix-blend-mod
 @keyframes sp{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.spin{animation:none}}
 .ctr{text-align:center}.big{font-size:22px;font-weight:700;margin:6px 0}
+.card .add[disabled]{background:#eee;color:#777;cursor:not-allowed}.card .img:empty::after{content:"No photo";color:#888;font-size:13px}
+
+.acct{background:none;border:1px solid var(--y);color:var(--y);border-radius:20px;padding:6px 14px;font-weight:600;font-size:12px}
+.acct:hover{background:var(--y);color:#222}
+.ordl{border:1px solid var(--ln);border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px}
+.ordl .r{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.ordl small{color:var(--mu);display:block;margin-top:4px;line-height:1.5}
+.stt{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#e5f3ec;color:#066b41;white-space:nowrap}
+.stt.w{background:#fff4cc;color:#7a5a00}.stt.b{background:#fde8e6;color:#b3261e}.stt.d{background:#eee;color:#555}
+.sub2{color:var(--mu);font-size:13px;line-height:1.5;margin-bottom:14px}
+.sw{text-align:center;margin-top:14px;font-size:13px;color:var(--mu)}
+.sw button{background:none;color:var(--g);font-weight:600;text-decoration:underline;font-size:13px}
+.hd2{font-size:15px;font-weight:700;margin:20px 0 10px}
+.signin-hint{background:#e5f3ec;color:#066b41;border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:14px;line-height:1.5}
+.signin-hint button{background:none;color:#066b41;font-weight:700;text-decoration:underline;font-size:12px}
 </style>
 </head>
 <body>
 <nav><div class="wrap">
   <div class="bw"><button class="browse" aria-expanded="false" aria-controls="menu">☰ Browse all categories</button><div class="menu" id="menu" hidden></div></div>
   <div class="links"><a href="#">Home</a><a href="#products" data-f="all:" data-l="All products">Shop</a><a href="#products" data-f="cat:Fruits" data-l="Fruits">Fruits</a><a href="#products" data-f="cat:Vegetables" data-l="Vegetables">Vegetable</a><a href="#products" data-f="q:beverage" data-l="Beverages">Beverages</a><a href="#">About us</a><a href="#">Blogs</a></div>
-  <div class="right"><span>Recently viewed ⌄</span><button class="cart" id="cart">🛒 Cart: 0</button></div>
+  <div class="right"><button class="acct" id="acct">Sign in</button><button class="cart" id="cart">🛒 Cart: 0</button></div>
 </div></nav>
 
 <header class="hero"><div class="wrap">
@@ -296,7 +311,7 @@ var grid=$("grid"),menu=$("menu"),btn=document.querySelector(".browse");
 [].forEach.call(document.querySelectorAll("#catlist .cat"),function(a,i){a.dataset.f=F[i][1];a.dataset.l=F[i][0]});
 var items=[["All products","all:"],["Fruits","cat:Fruits"],["Vegetables","cat:Vegetables"],null,["Carrots","q:carrot"],["Strawberries","q:strawberr"],["Pineapples","q:pineapple"],["Peaches","q:peach"],["Cauliflower","q:cauliflower"]];
 menu.innerHTML=items.map(function(x){return x?'<a href="#products" data-f="'+x[1]+'" data-l="'+x[0]+'">'+x[0]+'</a>':'<hr>'}).join("");
-function match(p,f){var t=f.split(":");if(t[0]==="all")return true;if(t[0]==="cat")return p[1]===t[1];return p[3].toLowerCase().indexOf(t[1])>-1}
+function match(p,f){var t=f.split(":");if(t[0]==="all")return true;if(t[0]==="cat")return String(p[1]).toLowerCase()===t[1].toLowerCase();return p[3].toLowerCase().indexOf(t[1])>-1}
 function setF(f,label){
  var shown=0;
  [].forEach.call(grid.children,function(c,i){var ok=match(prods[i],f);c.style.display=ok?"":"none";if(ok)shown++});
@@ -357,6 +372,91 @@ document.addEventListener("click",function(e){
   window.open("https://wa.me/"+CFG.whatsapp+"?text="+encodeURIComponent(msg),"_blank")}
  if(g.dataset.go==="finish")close_();
 });
+})();
+</script>
+<script>
+/* Products come from the admin dashboard (/api/products). If the database is not connected, the built-in list stays. */
+(function(){
+ var FB={"Fresh strawberry":IM.straw,"Fresh cauliflower":IM.cauli,"Fresh peaches":IM.peach,"Organic carrots":IM.carrot,"Sweet pineapple":IM.pine};
+ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+ fetch("/api/products",{cache:"no-cache"}).then(function(r){return r.json()}).then(function(d){
+  if(!d||!d.products)return;
+  cart={};sync();
+  prods=d.products.map(function(p){return[p.image||FB[p.name]||"",p.category,String(p.rating),p.name,p.unit,p.price,p.oldPrice||0,p.stock]});
+  $("grid").innerHTML=prods.length?prods.map(function(p,i){
+   var sale=p[6]>p[5],pct=sale?Math.round((p[6]-p[5])/p[6]*100):0,out=p[7]<=0;
+   return '<article class="card">'+(sale?'<span class="off">'+pct+'% off</span>':'')+'<button class="heart" aria-label="Add to wishlist" aria-pressed="false">♡</button><div class="img">'+(p[0]?'<img src="'+esc(p[0])+'" alt="'+esc(p[3])+'">':'')+'</div><div class="meta"><span>'+esc(p[1])+'</span><span>★ '+esc(p[2])+'</span></div><h4>'+esc(p[3])+'</h4><small>'+esc(p[4])+'</small><div class="buy"><div class="price">'+fmt(p[5])+(sale?'<s>'+fmt(p[6])+'</s>':'')+'</div><button class="add" data-i="'+i+'"'+(out?' disabled':'')+'>'+(out?'Sold out':'🛍 Add')+'</button></div></article>'}).join(""):'<p class="empty" style="width:100%">No products available right now. Please check back soon.</p>';
+ }).catch(function(){});
+})();
+</script>
+<script>
+/* ===== Customer accounts: sign up, sign in, saved details, my orders ===== */
+(function(){
+ var me=null,back=null,prev=draw;
+ var LBL={pending:["Waiting for payment","w"],paid:["Paid",""],processing:["Being prepared",""],delivered:["Delivered","d"],cancelled:["Cancelled","b"],failed:["Payment failed","b"]};
+ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+ function local(p){return String(p||"").replace(/^237/,"")}
+ function setBtn(){$("acct").textContent=me?"Hi, "+me.name.split(" ")[0]:"Sign in"}
+ function call(method,url,body){
+  return fetch(url,{method:method,headers:body?{"Content-Type":"application/json"}:{},body:body?JSON.stringify(body):undefined})
+   .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||"Something went wrong.");return j})});
+ }
+ function field(label,name,type,auto,val,extra){return '<label class="fld">'+label+'<input name="'+name+'" type="'+type+'" autocomplete="'+auto+'" value="'+esc(val||"")+'" '+(extra||"")+'></label>'}
+
+ draw=function(){
+  var d=$("db"),t=$("dt");
+  if(["signin","signup","account"].indexOf(view)<0){
+   prev();
+   if(view==="checkout"){
+    if(me){
+     var f1=$("f1"),f2=$("f2"),f3=$("f3");
+     if(f1&&!f1.value)f1.value=me.name;if(f2&&!f2.value)f2.value=local(me.phone);if(f3&&!f3.value)f3.value=me.address||"";
+     d.insertAdjacentHTML("afterbegin",'<div class="signin-hint">Signed in as '+esc(me.email)+'. Your details are filled in.</div>');
+    }else{
+     d.insertAdjacentHTML("afterbegin",'<div class="signin-hint">Have an account? <button type="button" data-c="to-signin">Sign in</button> to fill in your details and see your orders.</div>');
+    }
+   }
+   return;
+  }
+  if(view==="signin"){
+   t.textContent="Sign in";
+   d.innerHTML='<p class="sub2">Sign in to save your details and see your orders.</p><form data-cf="signin" novalidate>'+field("Email","email","email","username")+field("Password","password","password","current-password")+'<div class="err" role="alert" id="cs-err"></div><button class="btn full" type="submit">Sign in</button></form><p class="sw">New here? <button type="button" data-c="to-signup">Create an account</button></p>';
+  }else if(view==="signup"){
+   t.textContent="Create account";
+   d.innerHTML='<p class="sub2">An account saves your delivery details and keeps your order history. You can also check out without one.</p><form data-cf="signup" novalidate>'+field("Full name","name","text","name")+field("Email","email","email","username")+field("Mobile number (MTN or Orange)","phone","tel","tel",""," inputmode=\"tel\" placeholder=\"6XX XXX XXX\"")+field("Password (8 or more characters)","password","password","new-password")+'<label class="fld">Delivery address (optional)<textarea name="address" rows="2" placeholder="Town, quarter, landmark" autocomplete="street-address"></textarea></label><div class="err" role="alert" id="cs-err"></div><button class="btn full" type="submit">Create account</button></form><p class="sw">Already have an account? <button type="button" data-c="to-signin">Sign in</button></p>';
+  }else{
+   t.textContent="My account";
+   d.innerHTML='<form data-cf="profile" novalidate>'+field("Full name","name","text","name",me.name)+'<label class="fld">Email<input value="'+esc(me.email)+'" disabled></label>'+field("Mobile number","phone","tel","tel",local(me.phone)," inputmode=\"tel\"")+'<label class="fld">Delivery address<textarea name="address" rows="2" autocomplete="street-address">'+esc(me.address)+'</textarea></label><div class="err" role="alert" id="cs-err"></div><button class="btn full" type="submit">Save details</button></form><div class="hd2">My orders</div><div id="cs-orders"><p class="note">Loading…</p></div><button class="lnk" type="button" data-c="logout">Sign out</button>';
+   call("GET","/api/customer/orders").then(function(r){
+    var box=$("cs-orders");if(!box||view!=="account")return;
+    box.innerHTML=r.orders.length?r.orders.map(function(o){var s=LBL[o.status]||[o.status,"d"];
+     return '<div class="ordl"><div class="r"><b>'+esc(o.ref)+'</b><span class="stt '+s[1]+'">'+esc(s[0])+'</span></div><small>'+new Date(o.created_at).toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})+' · '+fmt(o.total)+'<br>'+o.items.map(function(i){return esc(i.qty)+" × "+esc(i.name)}).join(", ")+'</small></div>'}).join(""):'<p class="note">No orders yet. When you pay for an order it shows up here.</p>';
+   }).catch(function(){var b=$("cs-orders");if(b)b.innerHTML='<p class="note">Could not load your orders. Try again later.</p>'});
+  }
+ };
+
+ function finish(c){me=c;setBtn();if(back){view=back;back=null}else view="account";draw()}
+ document.addEventListener("submit",function(e){
+  var f=e.target.closest("[data-cf]");if(!f)return;e.preventDefault();
+  var kind=f.dataset.cf,btn=f.querySelector("button[type=submit]"),err=$("cs-err"),data={};
+  [].forEach.call(f.elements,function(el){if(el.name)data[el.name]=el.value});
+  err.textContent="";
+  var need=kind==="signin"?["email","password"]:kind==="signup"?["name","email","phone","password"]:["name","phone"];
+  for(var i=0;i<need.length;i++)if(!String(data[need[i]]||"").trim()){err.textContent="Fill in all the required fields.";f.elements[need[i]].focus();return}
+  btn.disabled=true;
+  call(kind==="profile"?"PUT":"POST",kind==="profile"?"/api/customer/me":"/api/customer/"+(kind==="signin"?"login":"register"),data).then(function(r){
+   if(kind==="profile"){me=r.customer;setBtn();say("Details saved");btn.disabled=false}
+   else{say(kind==="signin"?"Signed in":"Account created");finish(r.customer)}
+  }).catch(function(x){err.textContent=x.message;btn.disabled=false});
+ });
+ document.addEventListener("click",function(e){
+  if(e.target.closest("#acct")){open_(me?"account":"signin");return}
+  var b=e.target.closest("[data-c]");if(!b)return;var c=b.dataset.c;
+  if(c==="to-signin"){if(view==="checkout")back="checkout";view="signin";draw()}
+  if(c==="to-signup"){view="signup";draw()}
+  if(c==="logout"){call("POST","/api/customer/logout",{}).catch(function(){}).then(function(){me=null;back=null;setBtn();close_();say("Signed out")})}
+ });
+ call("GET","/api/customer/me").then(function(r){if(r.customer){me=r.customer;setBtn()}}).catch(function(){});
 })();
 </script>
 </body>
